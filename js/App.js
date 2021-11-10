@@ -1,55 +1,64 @@
-import NotesAPI from "./NotesAPI.js";
 import NotesView from "./NotesView.js";
+import NotesAPI from "./NotesAPI.js";
 
 export default class App {
-    constructor(root){
+    constructor(root) {
         this.notes = [];
         this.activeNote = null;
-        this.view = new NotesView(root , this._handlers());
+        this.view = new NotesView(root, this._handlers());
 
         this._refreshNotes();
     }
-    _refreshNotes(){
+
+    _refreshNotes() {
         const notes = NotesAPI.getAllNotes();
+
         this._setNotes(notes);
 
-        if(notes.length > 0){
+        if (notes.length > 0) {
             this._setActiveNote(notes[0]);
         }
     }
 
-    _setActiveNote(note){
-        this.activeNote = note;
-        this.view.updateActiveNote(note);
-    }
-
-    _setNotes(notes){
+    _setNotes(notes) {
         this.notes = notes;
         this.view.updateNoteList(notes);
         this.view.updateNotePreviewVisibility(notes.length > 0);
     }
 
-    _handlers(){
+    _setActiveNote(note) {
+        this.activeNote = note;
+        this.view.updateActiveNote(note);
+    }
+
+    _handlers() {
         return {
-            onNoteSelect : noteId =>{
-                console.log('Note selected: ', noteId);
-                const selectedNote = this.notes.find(note=> note.id === noteId);
+            onNoteSelect: noteId => {
+                const selectedNote = this.notes.find(note => note.id == noteId);
                 this._setActiveNote(selectedNote);
             },
-            onNoteAdd : ()=>{
+            onNoteAdd: () => {
                 const newNote = {
-                    title : 'New Note',
-                    body : 'Take note...'
+                    title: "New Note",
+                    body: "Take note..."
                 };
+
                 NotesAPI.saveNote(newNote);
                 this._refreshNotes();
             },
-            onNoteEdit:(title , body)=>{
-                console.log('Edit note : ', title,body);
-            } ,
-            onNoteDelete : noteId =>{
-                console.log('Note DELETED : ', noteId);
-            }
-        }
+            onNoteEdit: (title, body) => {
+                NotesAPI.saveNote({
+                    id: this.activeNote.id,
+                    title,
+                    body
+                });
+
+                this._refreshNotes();
+            },
+            onNoteDelete: noteId => {
+                NotesAPI.deleteNote(noteId);
+                this._refreshNotes();
+            },
+        };
     }
 }
