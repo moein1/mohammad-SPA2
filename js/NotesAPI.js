@@ -8,7 +8,7 @@ export default class NotesAPI {
 
   static saveNote(noteToSave) {
     const notes = NotesAPI.getAllNotes();
-    var existing = notes.find((note) => note.id === noteToSave.id);
+    var existing = notes.find(note => note.id == noteToSave.id);
     if (existing) {
       existing = Object.assign(existing, noteToSave);
       existing.updated = new Date().toISOString();
@@ -23,7 +23,7 @@ export default class NotesAPI {
 
   static deleteNote(id) {
     const notes = NotesAPI.getAllNotes();
-    const newNotes = notes.filter(note=>note.id !== id);
+    const newNotes = notes.filter(note=>note.id != id);
     localStorage.setItem("notesapp-notes", JSON.stringify(newNotes));
   }
 }
